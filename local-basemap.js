@@ -3,7 +3,7 @@ function localBasemap(){
  const index=new Map(),loaded=new Set(),cell=32768;
  const styles={park:[9,'#394055'],lake:[8,'#263d5c'],river:[9,'#3f5e7c',1.2],stream:[14,'#425574',1],major:[8,'#8d7059',1.5],primary:[9,'#7e6a59',2],secondary:[10,'#6b6161',1.7],tertiary:[12,'#625f66',1.6],street:[14,'#525461',1.2],lane:[16,'#414450',1],city:[8],town:[12]};
  function load(n){
-   if(loaded.has(n))return;
+   if(loaded.has(n)||!LOCAL_BASEMAP[n])return;
    const bytes=fflate.gunzipSync(bytes64(LOCAL_BASEMAP[n]));
    for(const [kind,name,paths] of JSON.parse(new TextDecoder().decode(bytes))){
      let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;

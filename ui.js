@@ -126,7 +126,8 @@ async function acquire(b,force=false,deep=false,ring=null){
    const [mapData,imagery,facilities]=await Promise.all([
      Promise.resolve(cached?reusable:loadOSM()).then(data=>{progress.source(0,cached?'已读存档':'已获取');return data}),
      imageryFor(b,controller.signal,deep,ring).then(data=>{progress.source(2,'读图 '+data.observations.length+' 张');return data}),
-     queryFacilities(query,controller.signal).then(data=>{progress.source(1,data.rows.length?'返回 '+data.rows.length+' 处':data.status);return data})
+     queryFacilities(query,controller.signal).then(data=>{progress.source(1,data.rows.length?'返回 '+data.rows.length+' 处':data.status);return data}),
+     ensureLocalData(b,controller.signal)
    ]);
    if(token!==request)return;
    const archived=new Map();
@@ -152,9 +153,17 @@ async function acquire(b,force=false,deep=false,ring=null){
  finally{if(token===request){controller.abort();$('deep').disabled=$('fetch').disabled=false}}
 }
 $('fetch').onclick=()=>acquire(bbox,true,false,activeRing);$('deep').onclick=()=>acquire(bbox,true,true,activeRing);
-initMainMap();cityOverview();run(false);initAtlasShell();
+async function initializeAtlas(){
+ initMainMap();cityOverview();initAtlasShell();
+ loadMapDetails();
+ setBootStatus('正在载入默认片区的建筑、设施与感知数据');
+ await ensureLocalData(DEFAULT);
+ run(false);
+ document.getElementById('bootLoading').remove();
+}
 $('amapHelp').textContent=collectionService?'设置 AMAP_KEY 并重启在线采集服务后，重新采集即可查询高德。':'当前使用内置设施存档。实时增查高德需在项目目录启动「在线采集.cmd」并配置 AMAP_KEY。';
 initCollectionFiles();
+async function initializeFacilities(){
 if(collectionService){
  const initial=source,box=bbox.slice(),key=request;
  const pad=analysisContextBounds(box);
@@ -165,5 +174,7 @@ if(collectionService){
    else $('poiStatus').textContent=facilities.status;
  });
 }
+}
+initializeAtlas().then(initializeFacilities).catch(showBootError);
 
 
