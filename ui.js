@@ -155,11 +155,11 @@ async function acquire(b,force=false,deep=false,ring=null){
 $('fetch').onclick=()=>acquire(bbox,true,false,activeRing);$('deep').onclick=()=>acquire(bbox,true,true,activeRing);
 async function initializeAtlas(){
  initMainMap();cityOverview();initAtlasShell();
- loadMapDetails();
  setBootStatus('正在载入默认片区的建筑、设施与感知数据');
  await ensureLocalData(DEFAULT);
  run(false);
  document.getElementById('bootLoading').remove();
+ loadMapDetails();
 }
 $('amapHelp').textContent=collectionService?'设置 AMAP_KEY 并重启在线采集服务后，重新采集即可查询高德。':'当前使用内置设施存档。实时增查高德需在项目目录启动「在线采集.cmd」并配置 AMAP_KEY。';
 initCollectionFiles();

@@ -10,7 +10,7 @@ async function loadMapDetails() {
   }
   notice.textContent = '正在补载道路与底图细节…';
   try {
-    const response = await fetch(document.getElementById('atlasBundle').dataset.map);
+    const response = await fetch(document.getElementById('atlasBundle').dataset.map, {priority:'low'});
     if (!response.ok) throw Error('HTTP ' + response.status);
     const bytes = new Uint8Array(await response.arrayBuffer());
     const details = JSON.parse(new TextDecoder().decode(fflate.gunzipSync(bytes)));
